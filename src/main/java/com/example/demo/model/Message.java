@@ -1,26 +1,33 @@
 package com.example.demo.model;
 
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import java.sql.Date;
+import jakarta.persistence.*;
 
-
-
-// @AllArgsConstructor
-// @NoArgsConstructor
-// @Getter
-// @Setter
 @Entity
+@Table(name = "messages")
 public class Message {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, length = 500)
+    @Column(nullable = false, length = 1000)
     private String message;
+
+    @Column(nullable = false)
+    private String image;
+
+    @Column(nullable = false)
+    private Date date;
+
+    @ManyToOne
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
+    
+    
+    @ManyToOne
+    @JoinColumn(name = "group_id", nullable = false)
+    private Group group;
 
     public Message() {
     }
@@ -44,4 +51,29 @@ public class Message {
     public void setId(Long id) {
         this.id = id;
     }
+
+    public String getImage() {
+        return image;
+    }
+
+    public void setImage(String image) {
+        this.image = image;
+    }
+
+    public Date getDate() {
+        return date;
+    }
+
+    public void setDate(Date date) {
+        this.date = date;
+    }
+    
+    public User getUser() {
+        return user;
+    }
+    
+    public void setUser(User user) {
+        this.user = user;
+    }
+
 }

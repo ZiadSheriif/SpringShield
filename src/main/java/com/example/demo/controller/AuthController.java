@@ -15,7 +15,6 @@ public class AuthController {
 
     private BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
-    // Signup endpoint
     @PostMapping("/signup")
     public String signup(@RequestBody User user) {
         // Check if the email already exists
@@ -32,11 +31,12 @@ public class AuthController {
         return "User signed up successfully!";
     }
 
-    // Login endpoint
     @PostMapping("/login")
     public String login(@RequestBody User user) {
         System.out.println("====================================");
-        System.out.println("ZIAAAAAAD");
+        System.out.println("User: " + user.getEmail());
+        System.out.println("Password: " + user.getPassword());
+
         System.out.println("====================================");
         // Check if the email exists
         User existingUser = userRepository.findByEmail(user.getEmail());
