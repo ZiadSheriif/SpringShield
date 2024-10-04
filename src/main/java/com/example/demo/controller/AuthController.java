@@ -4,6 +4,7 @@ import com.example.demo.model.User;
 import com.example.demo.service.UserService;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,7 +49,11 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<String> login(@RequestBody User user) {
-        user.printUserInfo();
+        // get all users
+        // List<User> users = userService.getAllUsers();
+        // for (User u : users) {
+        // u.printUserInfo();
+        // }
 
         Optional<User> existingUser = userService.getUserByEmail(user.getEmail());
         if (!existingUser.isPresent()) {
