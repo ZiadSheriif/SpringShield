@@ -12,7 +12,6 @@ public class DataService {
     private static List<User> users = new ArrayList<>();
     private static List<Message> messages = new ArrayList<>();
 
-    // Static block to initialize some data
     static {
         users.add(new User("Alice", "alice@example.com", "password123"));
         users.add(new User("Bob", "bob@example.com", "password456"));
@@ -21,7 +20,6 @@ public class DataService {
         messages.add(new Message("Hi Alice, this is Bob!"));
     }
 
-    // Simulated database operations
     public List<User> getAllUsers() {
         return users;
     }

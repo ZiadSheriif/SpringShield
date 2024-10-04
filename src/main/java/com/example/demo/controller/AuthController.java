@@ -1,8 +1,14 @@
 package com.example.demo.controller;
 
 import com.example.demo.model.User;
-import com.example.demo.repository.UserRepository;
+import com.example.demo.service.UserService;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
@@ -11,45 +17,51 @@ import org.springframework.web.bind.annotation.*;
 public class AuthController {
 
     @Autowired
-    private UserRepository userRepository;
+    private UserService userService;
 
     private BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
     @PostMapping("/signup")
-    public String signup(@RequestBody User user) {
-        // Check if the email already exists
-        if (userRepository.findByEmail(user.getEmail()) != null) {
-            return "User with this email already exists!";
+    public ResponseEntity<Map<String, String>> signup(@RequestBody User user) {
+        user.printUserInfo();
+
+        if (userService.getUserByEmail(user.getEmail()).isPresent()) {
+            Map<String, String> response = new HashMap<>();
+            response.put("message", "User already exists!");
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
         }
 
-        // Hash the password before saving
         String encodedPassword = passwordEncoder.encode(user.getPassword());
         user.setPassword(encodedPassword);
 
         // Save the new user
-        userRepository.save(user);
-        return "User signed up successfully!";
+        // userService.saveUser(user);
+        return ResponseEntity.ok().body(new HashMap<String, String>() {
+            {
+                put("message", "User registered successfully!");
+            }
+        });
+
+        // return ResponseEntity.ok("User registered successfully!"); in case of a
+        // String response
     }
 
     @PostMapping("/login")
-    public String login(@RequestBody User user) {
-        System.out.println("====================================");
-        System.out.println("User: " + user.getEmail());
-        System.out.println("Password: " + user.getPassword());
+    public ResponseEntity<String> login(@RequestBody User user) {
+        user.printUserInfo();
 
-        System.out.println("====================================");
-        // Check if the email exists
-        User existingUser = userRepository.findByEmail(user.getEmail());
-        if (existingUser == null) {
-            return "User does not exist!";
+        Optional<User> existingUser = userService.getUserByEmail(user.getEmail());
+        if (!existingUser.isPresent()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("User not found!");
+
         }
 
         // Validate password
-        boolean isPasswordMatch = passwordEncoder.matches(user.getPassword(), existingUser.getPassword());
+        boolean isPasswordMatch = passwordEncoder.matches(user.getPassword(), existingUser.get().getPassword());
         if (!isPasswordMatch) {
-            return "Invalid credentials!";
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid password!");
         }
 
-        return "Login successful!";
+        return ResponseEntity.ok("User logged in successfully!");
     }
 }
