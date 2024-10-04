@@ -1,18 +1,14 @@
 package com.example.demo.controller;
 
 import com.example.demo.model.Message;
-import com.example.demo.service.MessageService;
-
 import com.example.demo.service.GroupService;
+import com.example.demo.service.MessageService;
+import org.bson.types.ObjectId;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 
 @RestController
 @RequestMapping("/messages")
@@ -25,17 +21,24 @@ public class MessageController {
     private GroupService groupService;
 
     @GetMapping("/{groupId}")
-    public List<Message> getMessagesByGroupId(@PathVariable String groupId) {
+    public ResponseEntity<List<Message>> getMessagesByGroupId(@PathVariable ObjectId groupId) {
         System.out.println("groupId: " + groupId);
+        List<Message> messages = groupService.getMessagesByGroupId(groupId);
 
-        return groupService.getMessagesByGroupId(groupId);
+        if (messages.isEmpty()) {
+            return ResponseEntity.notFound().build(); // Return 404 if no messages found
+        }
+        return ResponseEntity.ok(messages); // Return 200 with the list of messages
     }
 
     @GetMapping("/")
-    public List<Message> getMessagesByGroupId2(@RequestParam String groupId) {
+    public ResponseEntity<List<Message>> getMessagesByGroupIdQuery(@RequestParam ObjectId groupId) {
         System.out.println("groupId: " + groupId);
-        return messageService.getMessagesByGroupId(groupId);
+        List<Message> messages = messageService.getMessagesByGroupId(groupId);
 
+        if (messages.isEmpty()) {
+            return ResponseEntity.notFound().build(); // Return 404 if no messages found
+        }
+        return ResponseEntity.ok(messages); // Return 200 with the list of messages
     }
-
 }

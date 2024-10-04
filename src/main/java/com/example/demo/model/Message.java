@@ -1,5 +1,6 @@
 package com.example.demo.model;
 
+import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import com.fasterxml.jackson.annotation.JsonFormat;
@@ -11,13 +12,12 @@ import java.util.Date;
 public class Message {
 
     @Id
-    private String id;
+    private ObjectId id;
 
     private String message;
 
     private String image;
-    
-    
+
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
     private Date date;
 
@@ -25,7 +25,7 @@ public class Message {
     private User user;
 
     @DBRef
-    private Group group;
+    private ObjectId groupId;
 
     public Message() {
     }
@@ -35,7 +35,11 @@ public class Message {
     }
 
     public String getId() {
-        return id;
+        return id.toHexString();
+    }
+
+    public void setId(ObjectId id) {
+        this.id = id;
     }
 
     public String getMessage() {
@@ -44,10 +48,6 @@ public class Message {
 
     public void setMessage(String message) {
         this.message = message;
-    }
-
-    public void setId(String id) {
-        this.id = id;
     }
 
     public String getImage() {
@@ -74,11 +74,12 @@ public class Message {
         this.user = user;
     }
 
-    public Group getGroup() {
-        return group;
+    public String getGroupId() {
+        return this.groupId != null ? this.groupId.toHexString() : null;
     }
 
-    public void setGroup(Group group) {
-        this.group = group;
+    public void setGroupId(String groupId) {
+        this.groupId = new ObjectId(groupId);
     }
+
 }

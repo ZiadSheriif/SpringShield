@@ -1,5 +1,6 @@
 package com.example.demo.model;
 
+import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.DBRef;
@@ -10,7 +11,7 @@ import java.util.List;
 public class Group {
 
     @Id
-    private String id;
+    private ObjectId id;
 
     private String title;
 
@@ -34,7 +35,7 @@ public class Group {
     }
 
     public String getId() {
-        return id;
+        return id.toHexString();
     }
 
     public String getTitle() {

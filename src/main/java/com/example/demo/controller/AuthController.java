@@ -36,6 +36,25 @@ public class AuthController {
             return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
         }
 
+        String emailRegex = "^[a-zA-Z0-9_+&*-]+(?:\\.[a-zA-Z0-9_+&*-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,7}$";
+        if (!user.getEmail().matches(emailRegex)) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new HashMap<String, String>() {
+                {
+                    put("message", "Invalid email address!");
+                }
+            });
+        }
+
+        String passwordRegex = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=])(?=\\S+$).{8,}$";
+        if (!user.getPassword().matches(passwordRegex)) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new HashMap<String, String>() {
+                {
+                    put("message",
+                            "Password must contain at least 8 characters, one uppercase, one lowercase, one number and one special character!");
+                }
+            });
+        }
+
         String encodedPassword = passwordEncoder.encode(user.getPassword());
         user.setPassword(encodedPassword);
 
