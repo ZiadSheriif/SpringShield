@@ -1,74 +1,80 @@
 package com.example.demo.model;
+
+import org.bson.types.ObjectId;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.DBRef;
+
 import java.util.List;
 
-import jakarta.persistence.*;
-
-@Entity
-@Table(name = "groups")
+@Document(collection = "groups")
 public class Group {
-    
+
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-    
-    
-    @Column(nullable = false)
+    private ObjectId id;
+
     private String title;
-    
-    @Column
+
     private String description;
-    
-    @Column
+
     private String avatar;
-    
-    
-    @OneToMany(mappedBy = "group", cascade = CascadeType.ALL, orphanRemoval = true)
+
+    @DBRef
     private List<User> users;
-    
-    
-    @OneToMany(mappedBy = "group", cascade = CascadeType.ALL, orphanRemoval = true)
+
+    @DBRef
     private List<Message> messages;
-    
+
     public Group() {
     }
-    
+
     public Group(String title, String description, String avatar) {
         this.title = title;
         this.description = description;
         this.avatar = avatar;
     }
-    
-    
-    public Long getId() {
-        return id;
+
+    public String getId() {
+        return id.toHexString();
     }
-    
+
     public String getTitle() {
         return title;
     }
-    
+
     public void setTitle(String title) {
         this.title = title;
     }
-    
-    
+
     public String getDescription() {
         return description;
     }
 
-    
     public void setDescription(String description) {
         this.description = description;
     }
-    
+
     public String getAvatar() {
         return avatar;
     }
-    
+
     public void setAvatar(String avatar) {
         this.avatar = avatar;
     }
-    
-    
-    
+
+    public List<User> getUsers() {
+        return users;
+    }
+
+    public void setUsers(List<User> users) {
+        this.users = users;
+    }
+
+    public List<Message> getMessages() {
+        return messages;
+    }
+
+    public void setMessages(List<Message> messages) {
+        this.messages = messages;
+    }
 }

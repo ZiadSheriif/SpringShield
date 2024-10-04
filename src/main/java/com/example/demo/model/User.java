@@ -1,36 +1,31 @@
 package com.example.demo.model;
 
-import jakarta.persistence.*;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.DBRef;
+
 import java.util.List;
 
-@Entity
-@Table(name = "users")
+@Document(collection = "users")
 public class User {
 
     @Id // Primary key
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private String id;
 
-    @Column(nullable = false)
     private String username;
 
-    @Column(nullable = false, unique = true)
     private String email;
 
-    @Column(nullable = false)
     private String password;
 
-    @Column
     private String image;
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @DBRef
     private List<Message> messages;
 
-    @ManyToOne
-    @JoinColumn(name = "group_id", nullable = false)
+    @DBRef
     private Group group;
 
-    // Default constructor required by JPA (Java Persistence API)
     public User() {
     }
 
@@ -40,7 +35,7 @@ public class User {
         this.password = password;
     }
 
-    public Long getId() {
+    public String getId() {
         return id;
     }
 
@@ -56,7 +51,7 @@ public class User {
         return password;
     }
 
-    public void setId(Long id) {
+    public void setId(String id) {
         this.id = id;
     }
 
@@ -86,6 +81,14 @@ public class User {
 
     public void setMessages(List<Message> messages) {
         this.messages = messages;
+    }
+
+    public Group getGroup() {
+        return group;
+    }
+
+    public void setGroup(Group group) {
+        this.group = group;
     }
 
     public void printUserInfo() {

@@ -2,6 +2,7 @@ package com.example.demo.controller;
 
 import com.example.demo.model.User;
 import com.example.demo.service.UserService;
+import com.example.demo.util.JwtTokenUtil;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -15,6 +16,9 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/auth")
 public class AuthController {
+
+    @Autowired
+    private JwtTokenUtil jwtUtil;
 
     @Autowired
     private UserService userService;
@@ -31,11 +35,29 @@ public class AuthController {
             return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
         }
 
+        String emailRegex = "^[a-zA-Z0-9_+&*-]+(?:\\.[a-zA-Z0-9_+&*-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,7}$";
+        if (!user.getEmail().matches(emailRegex)) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new HashMap<String, String>() {
+                {
+                    put("message", "Invalid email address!");
+                }
+            });
+        }
+
+        String passwordRegex = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=])(?=\\S+$).{8,}$";
+        if (!user.getPassword().matches(passwordRegex)) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new HashMap<String, String>() {
+                {
+                    put("message",
+                            "Password must contain at least 8 characters, one uppercase, one lowercase, one number and one special character!");
+                }
+            });
+        }
+
         String encodedPassword = passwordEncoder.encode(user.getPassword());
         user.setPassword(encodedPassword);
 
-        // Save the new user
-        // userService.saveUser(user);
+        userService.saveUser(user);
         return ResponseEntity.ok().body(new HashMap<String, String>() {
             {
                 put("message", "User registered successfully!");
@@ -47,21 +69,36 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<String> login(@RequestBody User user) {
-        user.printUserInfo();
+    public ResponseEntity<Map<String, String>> login(@RequestBody User user) {
 
         Optional<User> existingUser = userService.getUserByEmail(user.getEmail());
         if (!existingUser.isPresent()) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("User not found!");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new HashMap<String, String>() {
+                {
+                    put("message", "User not found!");
+                }
+            });
 
         }
 
         // Validate password
         boolean isPasswordMatch = passwordEncoder.matches(user.getPassword(), existingUser.get().getPassword());
         if (!isPasswordMatch) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid password!");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new HashMap<String, String>() {
+                {
+                    put("message", "Invalid credentials!");
+                }
+            });
         }
 
-        return ResponseEntity.ok("User logged in successfully!");
+        User loggedUser = existingUser.get();
+        String token = jwtUtil.generateToken(loggedUser.getUsername());
+
+        return ResponseEntity.ok().body(new HashMap<String, String>() {
+            {
+                put("message", "User logged in successfully!");
+                put("token", token);
+            }
+        });
     }
 }
