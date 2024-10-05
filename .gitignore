@@ -12,7 +12,11 @@ target/
 .settings
 .springBeans
 .sts4-cache
-.application.properties/
+
+# Exclude specific properties files
+application.properties
+# Include example properties files
+!application-example.properties
 
 ### IntelliJ IDEA ###
 .idea
