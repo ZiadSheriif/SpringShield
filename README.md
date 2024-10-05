@@ -27,7 +27,7 @@ This project is a simple Spring Boot application that includes JWT-based authent
 1. Clone the repository:
 
     ```sh
-    git clone https://github.com/your-username/demo-spring-boot.git
+    git clone https://github.com/ZiadSheriif/SpringShield
     cd demo-spring-boot
     ```
 
